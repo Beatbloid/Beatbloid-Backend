@@ -1,0 +1,30 @@
+package com.beatbloid.backend.config;
+
+import com.beatbloid.backend.filters.AuthenticationFilter;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.context.annotation.Bean;
+
+@Configuration
+public class WebSecurityConfig {
+
+    private final AuthenticationFilter authenticationFilter;
+
+    public WebSecurityConfig(AuthenticationFilter authenticationFilter) {
+        this.authenticationFilter = authenticationFilter;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/**").permitAll()
+                .anyRequest().authenticated() 
+            )
+            .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class); 
+
+        return http.build();
+    }
+}
